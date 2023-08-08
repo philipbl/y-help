@@ -1,18 +1,56 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"time"
 
+	"github.com/akamensky/argparse"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 func main() {
+	// Set up CLI
+	parser := argparse.NewParser("y-help", "Help queue for Electrical and Computer Engineering department at BYU")
+
+	name := parser.String("n",
+		"name",
+		&argparse.Options{Required: true, Help: "Your name"})
+
+	course := parser.Selector("c",
+		"course",
+		[]string{"224", "320"},
+		&argparse.Options{Required: true, Help: "The course you need help with"})
+
+	isTA := parser.Flag("",
+		"ta",
+		&argparse.Options{Required: false, Help: "Specifiy if you are a TA"})
+
 	// Processes CLI arguments
+	err := parser.Parse(os.Args)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println()
+		fmt.Println(parser.Usage(nil))
+		return
+	}
+
+	fmt.Println(*name)
+	fmt.Println(*course)
+	fmt.Println(*isTA)
+
+	var app *tview.Application
+
+	if *isTA {
+		fmt.Println("You are a TA")
+		app = setupApplication(*name, *course)
+	} else {
+		fmt.Println("You are not a TA")
+		app = setupApplication(*name, *course)
+	}
 
 	// Starts the TUI application
-	app := setupApplication()
-
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
@@ -20,13 +58,13 @@ func main() {
 
 var cur_focus tview.Primitive
 
-func setupApplication() *tview.Application {
+func setupApplication(name, course string) *tview.Application {
 	app := tview.NewApplication()
 
 	// Set up header
 	header := tview.NewTextView().
 		SetTextAlign(tview.AlignCenter).
-		SetText("ECEn 224")
+		SetText(fmt.Sprintf("ECEn %v", course))
 
 	help_queue := tview.NewList()
 	pass_off_queue := tview.NewList()
@@ -42,7 +80,7 @@ func setupApplication() *tview.Application {
 			app.SetFocus(pass_off_queue)
 			return nil // Don't pass the event
 		} else if event.Rune() == 'a' {
-			help_queue.AddItem("New Person", "", 0, nil)
+			help_queue.AddItem(name, "", 0, nil)
 		} else if event.Rune() == 'r' || event.Rune() == 'd' {
 			cur_focus = help_queue
 			grid.AddItem(modal, 0, 0, 2, 2, 0, 0, false)
