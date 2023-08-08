@@ -77,6 +77,12 @@ func setupApplication() *tview.Application {
 		SetTextAlign(tview.AlignLeft).
 		SetText("q: quit, tab: switch queues, a: add, d or r: remove")
 
+	// Set up status bar
+	status_bar := tview.NewTextView().
+		SetTextAlign(tview.AlignRight).
+		SetDynamicColors(true).
+		SetText("[red]Disconnected[white]")
+
 	// Set up grid
 	grid.SetRows(1, 0, 1).
 		SetColumns(0, 0)
@@ -84,7 +90,8 @@ func setupApplication() *tview.Application {
 	grid.AddItem(header, 0, 0, 1, 2, 0, 0, false)
 	grid.AddItem(help_queue, 1, 0, 1, 1, 0, 0, true)
 	grid.AddItem(pass_off_queue, 1, 1, 1, 1, 0, 0, false)
-	grid.AddItem(footer, 2, 0, 1, 2, 0, 0, false)
+	grid.AddItem(footer, 2, 0, 1, 1, 0, 0, false)
+	grid.AddItem(status_bar, 2, 1, 1, 1, 0, 0, false)
 
 	// Set up alert modal
 
@@ -116,6 +123,7 @@ func setupApplication() *tview.Application {
 			app.QueueUpdateDraw(func() {
 				help_queue.AddItem("Philip Lundrigan", "", 0, nil)
 				pass_off_queue.AddItem("Philip Lundrigan", "", 0, nil)
+				status_bar.SetText("[green]Connected[white]")
 			})
 		}
 	}()
