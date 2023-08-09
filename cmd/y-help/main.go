@@ -35,17 +35,11 @@ func main() {
 		return
 	}
 
-	fmt.Println(*name)
-	fmt.Println(*course)
-	fmt.Println(*isTA)
-
 	var app *tview.Application
 
 	if *isTA {
-		fmt.Println("You are a TA")
 		app = setupTaApplication(*name, *course)
 	} else {
-		fmt.Println("You are not a TA")
 		app = setupApplication(*name, *course)
 	}
 
@@ -75,6 +69,7 @@ func createQueue(queue_name string) *tview.List {
 	list.ShowSecondaryText(false)
 	list.SetBorder(true)
 	list.SetTitle(queue_name)
+	list.SetSelectedStyle(tcell.StyleDefault.Foreground(tcell.ColorDefault).Background(tcell.ColorDefault))
 	list.SetFocusFunc(func() {
 		list.SetBorderColor(tcell.ColorGreen)
 		list.SetTitleColor(tcell.ColorGreen)
